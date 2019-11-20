@@ -1,23 +1,25 @@
 {
 	"name": "comby-vscode",
-	"displayName": "comby",
+	"displayName": "Comby",
 	"description": "Extension for comby in vscode",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
+	"activationEvents": [
+		"onCommand:comby-vscode.searchAndReplace"
+	],
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onCommand:extension.helloWorld"
-	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [{
-			"command": "extension.helloWorld",
-			"title": "Hello World"
-		}]
+		"commands": [
+			{
+				"command": "comby-vscode.searchAndReplace",
+				"title": "Comby: Match And Replace"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run compile",
@@ -33,8 +35,9 @@
 		"@types/vscode": "^1.40.0",
 		"glob": "^7.1.5",
 		"mocha": "^6.2.2",
-		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
+		"typescript": "^3.6.4",
 		"vscode-test": "^1.2.2"
-	}
+	},
+	"dependencies": {}
 }
