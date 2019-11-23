@@ -3,12 +3,8 @@ import { CombyMatch, CombyReplace } from "./comby";
 import { Match } from './match';
 import { getDecorationsForMatches, setDecorations, resetDecorations } from "./decorators";
 
-enum MatchBoxState {
-  Match,
-  Replace
-}
 
-export default class MatchBox implements Disposable {
+export default class CombyBox implements Disposable {
   private inputBox: InputBox;
   private matchCall: CombyMatch | null;
   private matches : Match[];
