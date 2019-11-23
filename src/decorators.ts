@@ -1,6 +1,5 @@
 import { Match, matchRangeToRange } from './match';
 import * as vscode from 'vscode';
-import { notDeepEqual } from 'assert';
 
 
 const totalDecorationType = vscode.window.createTextEditorDecorationType({
@@ -82,16 +81,23 @@ function getDecorationForMatch(match: Match): { key: string; range: vscode.Range
   return decorations;
 }
 
-export function setDecorationsForMatches(matches: Match[], textEditor: vscode.TextEditor) {
-  resetDecorations(textEditor);
+type ReadyToDecorate = [vscode.TextEditorDecorationType, { range: vscode.Range }[]];
+
+export function getDecorationsForMatches(matches: Match[]) : ReadyToDecorate[] {
+  const readyToDecorate : ReadyToDecorate[] = [];
   const decorations = matches.map(getDecorationForMatch).reduce((a, b) => a.concat(b));
   keys.forEach((key) => {
     const keyDecorations = decorations.filter(d => d.key === key);
-    textEditor.setDecorations(matchDecorations[key], keyDecorations);
+    readyToDecorate.push([matchDecorations[key], keyDecorations] as ReadyToDecorate);
   });
+  return readyToDecorate;
 }
 
-export function resetDecorations(textEditor: vscode.TextEditor) {
+export function setDecorations(decorations: ReadyToDecorate[], textEditor: vscode.TextEditor) : void {
+  decorations.forEach(([dt, ops]) => textEditor.setDecorations(dt, ops));
+}
+
+export function resetDecorations(textEditor: vscode.TextEditor) : void {
   keys.forEach((key) => {
     textEditor.setDecorations(matchDecorations[key], []);
   });

@@ -1,48 +1,48 @@
-import { window, Disposable } from "vscode";
-import { ChildProcess, exec } from "child_process";
+import { window, Disposable, TextEditorDecorationType, Range, EventEmitter, TextEditor } from "vscode";
+import { ChildProcess, exec, ExecException } from "child_process";
 import { parse as parsePath } from 'path';
-import { setDecorationsForMatches, resetDecorations } from "./decorators";
+import { getDecorationsForMatches, resetDecorations } from "./decorators";
 import { Match } from "./match";
 
-export default class Comby implements Disposable {
 
-  process: ChildProcess | null;
 
-  matches: any;
+export class CombyMatch implements Disposable {
 
-  constructor(queryString: string) {
+  private process: ChildProcess | null;
+  private onMatch: (matches: Match[]) => void;
 
+  constructor(queryString: string, onMatch: (matches: Match[]) => void) {
+    this.onMatch = onMatch;
     if (window.activeTextEditor) {
-
-      const path = parsePath(window.activeTextEditor.document.uri.fsPath);
-      const executable = 'comby';
-      const params = [`'${queryString}'`, `''`, '-json-lines', '-match-only', path.base, '-d', path.dir];
-      const command = `${executable} ${params.join(" ")}`;
-
-      this.process = exec(command, (error, stdout) => {
-        if (!error && stdout && window.activeTextEditor) {
-          const matches: Match[] = JSON.parse(stdout).matches;
-          setDecorationsForMatches(matches, window.activeTextEditor);
-        } else if (window.activeTextEditor) {
-          resetDecorations(window.activeTextEditor);
-        }
-      });
+      this.process = this.createProcess(queryString, window.activeTextEditor);
     } else {
       this.process = null;
     }
   }
 
-  kill() {
-    if (this.process) { this.process.kill(); }
+  private createProcess(queryString: string, textEditor: TextEditor) : ChildProcess {
+    const path = parsePath(textEditor.document.uri.fsPath);
+    const executable = 'comby';
+    const params = [`'${queryString}'`, `''`, '-json-lines', '-match-only', path.base, '-d', path.dir];
+    const command = `${executable} ${params.join(" ")}`;
+    return exec(command, this.execCallback);
   }
 
-  dispose() {
-    if (this.process) {
-      this.kill();
-      if (window.activeTextEditor) {
-        setDecorationsForMatches([], window.activeTextEditor);
-      }
+  private execCallback = (error: ExecException | null, stdout: string) => {
+    let matches: Match[] = [];
+    if (!error && stdout) {
+      matches = JSON.parse(stdout).matches;
     }
-
+    this.onMatch(matches);
   }
+
+  dispose = () => {
+    if (this.process) {
+      this.process.kill();
+    }
+  }
+}
+
+export class CombyReplace implements Disposable {
+  dispose() {}
 }

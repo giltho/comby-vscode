@@ -1,37 +1,61 @@
-import { window, InputBox } from "vscode";
-import Comby from "./comby";
-import { setDecorationsForMatches } from "./decorators";
+import { window, InputBox, Disposable } from "vscode";
+import { CombyMatch, CombyReplace } from "./comby";
+import { Match } from './match';
+import { getDecorationsForMatches, setDecorations, resetDecorations } from "./decorators";
 
 enum MatchBoxState {
-  Search,
+  Match,
   Replace
 }
 
-export default class MatchBox {
+export default class MatchBox implements Disposable {
   private inputBox: InputBox;
-  private currentCall: Comby | null;
-  private state: MatchBoxState;
+  private matchCall: CombyMatch | null;
+  private matches : Match[];
+  private replaceCall: CombyReplace | null;
 
   constructor() {
-    this.state = MatchBoxState.Search;
+    this.matches = [];
+    this.matchCall = null;
+    this.replaceCall = null;
     this.inputBox = window.createInputBox();
-    this.inputBox.placeholder = "Comby Pattern To Match";
-    this.inputBox.title = "Comby Pattern";
     this.inputBox.ignoreFocusOut = true;
-    this.inputBox.onDidChangeValue((input) => this.query(input));
+    this.initMatchState();
     this.inputBox.onDidHide(() => {
-      if (this.currentCall) {
-        this.currentCall.dispose();
-      }
+      this.dispose();
     });
-    this.currentCall = null;
   }
 
-  private query(input: string) {
-    if (this.currentCall) {
-      this.currentCall.kill();
+  private initMatchState() {
+    this.inputBox.placeholder = "Comby Pattern To Match";
+    this.inputBox.title = "Comby Matching";
+    this.inputBox.onDidChangeValue((input) => this.onChangeMatch(input));
+  }
+
+  private onChangeMatch(input: string) {
+    if (window.activeTextEditor) {
+      resetDecorations(window.activeTextEditor);
     }
-    this.currentCall = new Comby(input);
+    if (this.matchCall) {
+      this.matchCall.dispose();
+    }
+    this.matchCall = new CombyMatch(input, (matches) => {
+      console.log(matches);
+      this.matches = matches;
+      const decorations = getDecorationsForMatches(matches);
+      if (window.activeTextEditor) {
+        setDecorations(decorations, window.activeTextEditor);
+      }
+    });
+  }
+
+  dispose() {
+    if (this.matchCall) {
+      this.matchCall.dispose();
+    }
+    if (this.replaceCall) {
+      this.replaceCall.dispose();
+    }
   }
 
   show() { this.inputBox.show(); }
