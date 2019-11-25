@@ -12,8 +12,12 @@
 	"categories": [
 		"Other"
 	],
+	"repository": {
+		"type" : "git",
+		"url" : "https://github.com/giltho/comby-vscode.git"
+	},
 	"keywords": ["comby", "rewrite"],
-	"icon": "media/comby.svg",
+	"icon": "media/comby.png",
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
