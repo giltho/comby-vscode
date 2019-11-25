@@ -85,7 +85,7 @@ type ReadyToDecorate = [vscode.TextEditorDecorationType, { range: vscode.Range }
 
 export function getDecorationsForMatches(matches: Match[]) : ReadyToDecorate[] {
   const readyToDecorate : ReadyToDecorate[] = [];
-  const decorations = matches.map(getDecorationForMatch).reduce((a, b) => a.concat(b));
+  const decorations = matches.map(getDecorationForMatch).reduce((a, b) => a.concat(b), []);
   keys.forEach((key) => {
     const keyDecorations = decorations.filter(d => d.key === key);
     readyToDecorate.push([matchDecorations[key], keyDecorations] as ReadyToDecorate);
