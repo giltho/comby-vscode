@@ -12,6 +12,8 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": ["comby", "rewrite"],
+	"icon": "media/comby.svg",
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
