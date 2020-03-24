@@ -12,7 +12,7 @@ This is using codelens to preview rewrites, but this is not an optmized way of d
 
 <p align="center">
   <br />
-  <img src="media/match_replace.gif" alt="GitLens Preview" />
+  <img src="media/match_replace.gif" alt="Comby Preview" />
   <br />
 </p>
 
