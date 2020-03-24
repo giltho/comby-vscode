@@ -3,6 +3,7 @@
 	"displayName": "Comby",
 	"description": "Extension for comby in vscode",
 	"version": "0.0.1",
+	"publisher": "giltho",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
